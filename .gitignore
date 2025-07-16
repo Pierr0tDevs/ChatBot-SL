@@ -1,0 +1,10 @@
+.env
+chroma_db/
+__pycache__/
+*.pyc
+*.db
+*.log
+chatbot.py
+crear_db.py 
+extractor.py 
+productos.json
