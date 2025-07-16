@@ -12,8 +12,7 @@ import markdown
 import re
 
 # ✅ Crear app Flask y configuración de sesión
-app = Flask(__name__)
-app.secret_key = ""  # Cambiá esto por algo seguro
+app = Flask(__name__) # Cambiá esto por algo seguro
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
