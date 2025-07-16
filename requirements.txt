@@ -6,4 +6,5 @@ langchain-google-genai
 chromadb
 beautifulsoup4
 Flask-Session
+markdown
 
