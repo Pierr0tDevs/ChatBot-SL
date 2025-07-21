@@ -7,40 +7,35 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    body {
-      background-color: #f0f2f5;
+    html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #f0f2f5;
       font-family: system-ui, sans-serif;
     }
 
-    .chat-widget {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 360px;
-      max-height: 85vh;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    .chat-container {
+      height: 100%;
+      width: 100%;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      z-index: 1000;
+      background-color: #fff;
     }
 
     .chat-header {
-  background-color: #B74AE5; /* violeta ShiGa Labs */
-  color: white;
-  padding: 12px 16px;
-  font-weight: bold;
-}
-
+      background-color: #B74AE5;
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
     }
 
     .chat-body {
-      padding: 16px;
-      overflow-y: auto;
       flex-grow: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
     }
 
     .chat-message {
@@ -56,14 +51,12 @@
     .user-msg {
       background-color: #d1e7dd;
       align-self: flex-end;
-      margin-left: auto;
       text-align: right;
     }
 
     .bot-msg {
       background-color: #f1f1f1;
       align-self: flex-start;
-      margin-right: auto;
       text-align: left;
     }
 
@@ -84,7 +77,7 @@
     .chat-footer button {
       background: none;
       border: none;
-      color: #0d6efd;
+      color: #B74AE5;
       font-size: 20px;
       margin-left: 10px;
       cursor: pointer;
@@ -103,7 +96,7 @@
 </head>
 <body>
 
-<div class="chat-widget">
+<div class="chat-container">
   <div class="chat-header">
     🛒 Asistente de compras – ShiGa Labs
   </div>
@@ -112,15 +105,13 @@
     {% for item in historial %}
       <div class="chat-message user-msg">📨 {{ item.pregunta }}</div>
       <div class="chat-message bot-msg">
-  {% if item.respuesta %}
-    {{ item.respuesta | safe }}
-  {% else %}
-    <span class="text-muted"><em>💬 Pensando...</em></span>
-  {% endif %}
-</div>
-
-
-      {% if "No he encontrado un producto" in item.respuesta %}
+        {% if item.respuesta %}
+          {{ item.respuesta | safe }}
+        {% else %}
+          <span class="text-muted"><em>💬 Pensando...</em></span>
+        {% endif %}
+      </div>
+      {% if item.respuesta and "No he encontrado un producto" in item.respuesta %}
         <a class="btn btn-sm btn-success whatsapp-link" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
           💬 Consultar por WhatsApp
         </a>
@@ -135,13 +126,13 @@
 </div>
 
 <script>
-  // Scroll automático al fondo
   const chatBody = document.getElementById('chatBody');
   if (chatBody) {
-    chatBody.scrollTop = chatBody.scrollHeight;
+    const isNearBottom = chatBody.scrollHeight - chatBody.scrollTop - chatBody.clientHeight < 60;
+    if (isNearBottom) {
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
   }
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script
