@@ -34,7 +34,7 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
 vector_store = Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
 retriever = vector_store.as_retriever(search_kwargs={"k": 3})
-llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.7)
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 
 # ✅ Formatear documentos recuperados
 def format_docs(docs):
