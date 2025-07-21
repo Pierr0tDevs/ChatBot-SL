@@ -8,88 +8,131 @@
 
   <style>
     body {
-      background-color: #f8f9fa;
-      padding-top: 40px;
+      background-color: #f0f2f5;
+      margin: 0;
+      font-family: system-ui, sans-serif;
     }
 
-    .container {
-      max-width: 800px;
-    }
-
-    .chat-container {
-      background-color: #ffffff;
+    .chat-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 360px;
+      max-height: 85vh;
+      background-color: #fff;
       border-radius: 10px;
-      border: 1px solid #dee2e6;
-      padding: 20px;
-    }
-
-    .chat-box {
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
     }
 
-    .user-msg, .bot-msg {
-      max-width: 80%;
+    .chat-header {
+      background-color: #0d6efd;
+      color: white;
       padding: 12px 16px;
-      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .chat-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    .chat-message {
+      max-width: 80%;
+      padding: 10px 14px;
       border-radius: 15px;
-      font-size: 16px;
+      margin: 8px 0;
+      font-size: 15px;
       white-space: pre-wrap;
+      animation: fadeIn 0.3s ease-in-out;
     }
 
     .user-msg {
       background-color: #d1e7dd;
       align-self: flex-end;
-      text-align: right;
       margin-left: auto;
+      text-align: right;
     }
 
     .bot-msg {
       background-color: #f1f1f1;
       align-self: flex-start;
-      text-align: left;
       margin-right: auto;
+      text-align: left;
+    }
+
+    .chat-footer {
+      border-top: 1px solid #ddd;
+      display: flex;
+      padding: 8px;
+    }
+
+    .chat-footer input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .chat-footer button {
+      background: none;
+      border: none;
+      color: #0d6efd;
+      font-size: 20px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .whatsapp-link {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div class="container text-center">
-    <h1 class="mb-4">🛠️ Asistente de compras – <span class="text-primary">ShiGa Labs</span></h1>
 
-    <!-- Formulario de búsqueda -->
-    <form method="post" class="mb-2">
-      <div class="input-group">
-        <input type="text" class="form-control" name="pregunta" placeholder="¿Qué estás buscando?" required>
-        <button type="submit" class="btn btn-primary">Consultar</button>
-      </div>
-    </form>
-
-    <!-- Botón para borrar conversación -->
-    <form method="post" action="/reset" class="mb-4">
-      <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Borrar conversación</button>
-    </form>
-
-    <!-- Chat visual -->
-    {% if historial %}
-    <div class="chat-container mt-4">
-      <div class="chat-box">
-        {% for item in historial %}
-          <div class="user-msg">📨 {{ item.pregunta }}</div>
-          <div class="bot-msg">{{ item.respuesta | safe }}</div>
-
-          {% if "No he encontrado un producto" in item.respuesta %}
-          <div class="mt-2 mb-2">
-            <a class="btn btn-success btn-sm" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
-              💬 Consultar por WhatsApp
-            </a>
-          </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
+<div class="chat-widget">
+  <div class="chat-header">
+    🛒 Asistente de compras – ShiGa Labs
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="chat-body" id="chatBody">
+    {% for item in historial %}
+      <div class="chat-message user-msg">📨 {{ item.pregunta }}</div>
+      <div class="chat-message bot-msg">{{ item.respuesta | safe }}</div>
+
+      {% if "No he encontrado un producto" in item.respuesta %}
+        <a class="btn btn-sm btn-success whatsapp-link" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
+          💬 Consultar por WhatsApp
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <form method="post" class="chat-footer">
+    <input type="text" name="pregunta" placeholder="Escribe aquí tu pregunta o consulta" required>
+    <button type="submit">➤</button>
+  </form>
+</div>
+
+<script>
+  // Scroll automático al fondo
+  const chatBody = document.getElementById('chatBody');
+  if (chatBody) {
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
