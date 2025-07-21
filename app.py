@@ -84,25 +84,29 @@ def index():
 
     if request.method == "POST":
         pregunta = request.form["pregunta"]
-        try:
-            respuesta_bruta = rag_chain.invoke(pregunta)
-            respuesta_limpia = normalizar_precios(respuesta_bruta)
-            respuesta_md = markdown.markdown(respuesta_limpia)
 
-            session["historial"].append({
-                "pregunta": pregunta,
-                "respuesta": respuesta_md
-            })
+        # Agregamos al historial con respuesta = None para que aparezca "Pensando..."
+        session["historial"].append({
+            "pregunta": pregunta,
+            "respuesta": None
+        })
+        session.modified = True
+        return redirect(url_for("index"))  # Se recarga como GET
+
+    # Procesamos solo la primera entrada sin respuesta
+    for item in session["historial"]:
+        if item["respuesta"] is None:
+            try:
+                respuesta_bruta = rag_chain.invoke(item["pregunta"])
+                respuesta_limpia = normalizar_precios(respuesta_bruta)
+                respuesta_md = markdown.markdown(respuesta_limpia)
+                item["respuesta"] = respuesta_md
+            except Exception as e:
+                item["respuesta"] = f"<span class='text-danger'>❌ Error: {e}</span>"
             session.modified = True
-        except Exception as e:
-            session["historial"].append({
-                "pregunta": pregunta,
-                "respuesta": f"<span class='text-danger'>❌ Error: {e}</span>"
-            })
-            session.modified = True
+            break  # Solo una por vez
 
     return render_template("index.html", historial=session["historial"])
-
 # ✅ Ruta para borrar el historial
 @app.route("/reset", methods=["POST"])
 def reset():
