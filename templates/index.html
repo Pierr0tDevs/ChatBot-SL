@@ -1,45 +1,58 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>ShiGa Labs – Chatbot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    /* Botón flotante */
+    :root {
+      --color-primario: #0d6efd;
+      --color-bot: #f1f1f1;
+      --color-user: #d1e7dd;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
     #chat-toggle {
       position: fixed;
       bottom: 20px;
       right: 20px;
       z-index: 9999;
-      background-color: #0d6efd;
+      background-color: var(--color-primario);
       color: white;
       border: none;
-      border-radius: 50px;
-      padding: 14px 18px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
     }
 
-    /* Widget flotante */
     #chat-widget {
       display: none;
       position: fixed;
-      bottom: 80px;
+      bottom: 90px;
       right: 20px;
-      width: 350px;
+      width: 380px;
       max-height: 600px;
-      background: #fff;
-      border: 1px solid #ccc;
+      background-color: white;
       border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       z-index: 9998;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
 
     .chat-header {
-      background-color: #0d6efd;
+      background-color: var(--color-primario);
       color: white;
-      padding: 10px 16px;
+      padding: 12px 16px;
       font-weight: bold;
       display: flex;
       justify-content: space-between;
@@ -48,13 +61,15 @@
 
     .chat-body {
       padding: 10px;
-      max-height: 450px;
+      flex-grow: 1;
       overflow-y: auto;
+      background-color: #fafafa;
     }
 
     .chat-footer {
       border-top: 1px solid #ddd;
       padding: 10px;
+      background: white;
     }
 
     .chat-box {
@@ -63,43 +78,64 @@
     }
 
     .user-msg, .bot-msg {
+      padding: 10px 14px;
+      margin: 6px 0;
       max-width: 80%;
-      padding: 8px 12px;
-      margin: 8px 0;
-      border-radius: 15px;
+      border-radius: 16px;
       font-size: 14px;
       white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
     .user-msg {
-      background-color: #d1e7dd;
+      background-color: var(--color-user);
       align-self: flex-end;
-      text-align: right;
-      margin-left: auto;
     }
 
     .bot-msg {
-      background-color: #f1f1f1;
+      background-color: var(--color-bot);
       align-self: flex-start;
-      text-align: left;
-      margin-right: auto;
     }
 
-    form input {
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
       font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button[type="submit"] {
+      background-color: var(--color-primario);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      font-size: 14px;
+      margin-top: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    @media (max-width: 450px) {
+      #chat-widget {
+        width: 95%;
+        right: 2.5%;
+        bottom: 80px;
+      }
     }
   </style>
 </head>
 <body>
 
 <!-- Botón flotante -->
-<button id="chat-toggle">💬 Asistente</button>
+<button id="chat-toggle">💬</button>
 
-<!-- Widget flotante -->
+<!-- Chat widget -->
 <div id="chat-widget">
   <div class="chat-header">
-    Chat con ShiGa Labs
-    <button onclick="document.getElementById('chat-widget').style.display='none'" class="btn btn-sm btn-light">✖</button>
+    Asistente ShiGa Labs
+    <button onclick="document.getElementById('chat-widget').style.display='none'" style="background:none;border:none;color:white;font-size:16px;">✖</button>
   </div>
   <div class="chat-body">
     <div class="chat-box">
@@ -107,8 +143,8 @@
         <div class="user-msg">{{ item.pregunta }}</div>
         <div class="bot-msg">{{ item.respuesta | safe }}</div>
         {% if "No he encontrado un producto" in item.respuesta %}
-        <div class="mt-2 mb-2">
-          <a class="btn btn-success btn-sm" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
+        <div class="bot-msg">
+          <a class="btn btn-success" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
             💬 Consultar por WhatsApp
           </a>
         </div>
@@ -118,19 +154,17 @@
   </div>
   <div class="chat-footer">
     <form method="post">
-      <div class="input-group">
-        <input type="text" name="pregunta" class="form-control" placeholder="Escribí tu consulta..." required>
-        <button type="submit" class="btn btn-primary">➤</button>
-      </div>
+      <input type="text" name="pregunta" placeholder="Escribí tu consulta..." required>
+      <button type="submit">Enviar ➤</button>
     </form>
-    <form method="post" action="/reset" class="mt-2 text-center">
-      <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Borrar conversación</button>
+    <form method="post" action="/reset">
+      <button type="submit" style="background:#dc3545">🗑 Borrar conversación</button>
     </form>
   </div>
 </div>
 
 <script>
-  document.getElementById("chat-toggle").addEventListener("click", function () {
+  document.getElementById("chat-toggle").addEventListener("click", () => {
     const widget = document.getElementById("chat-widget");
     widget.style.display = widget.style.display === "block" ? "none" : "block";
   });
