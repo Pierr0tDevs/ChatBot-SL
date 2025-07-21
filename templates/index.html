@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -160,13 +161,11 @@
     const pregunta = preguntaInput.value.trim();
     if (!pregunta) return;
 
-    // Mostrar mensaje del usuario
     const userMsg = document.createElement("div");
     userMsg.className = "chat-message user-msg";
     userMsg.textContent = "📨 " + pregunta;
     chatBody.appendChild(userMsg);
 
-    // Mostrar "Pensando..."
     const botMsg = document.createElement("div");
     botMsg.className = "chat-message bot-msg";
     botMsg.innerHTML = `
@@ -177,7 +176,6 @@
 
     chatBody.scrollTop = chatBody.scrollHeight;
 
-    // Pequeño delay para asegurar render antes del reload
     setTimeout(() => {
       chatForm.submit();
     }, 50);
@@ -185,7 +183,6 @@
     e.preventDefault();
   });
 
-  // Forzar apertura de WhatsApp en nueva pestaña desde iframe
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".whatsapp-link").forEach(btn => {
       btn.addEventListener("click", function (e) {
@@ -193,9 +190,17 @@
         window.open(this.href, "_blank", "noopener");
       });
     });
+
+    document.querySelectorAll(".bot-msg a").forEach(link => {
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener noreferrer");
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        window.open(this.href, "_blank", "noopener");
+      });
+    });
   });
 
-  // Scroll automático si está cerca del fondo
   if (chatBody) {
     const isNearBottom = chatBody.scrollHeight - chatBody.scrollTop - chatBody.clientHeight < 60;
     if (isNearBottom) {
