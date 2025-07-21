@@ -12,7 +12,8 @@ import markdown
 import re
 
 # ✅ Crear app Flask y configuración de sesión
-app = Flask(__name__) # Cambiá esto por algo seguro
+app = Flask(__name__)
+app.secret_key = ""  # Cambiá esto por algo seguro
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
@@ -57,7 +58,7 @@ Tu tarea es ayudar al cliente usando **solo** la información disponible en los 
 
 ### Instrucciones:
 - Responde en español, de forma clara y amable.
-- Presentate como el bot de ShiGa Labs solo una vez por chat.
+- Presentate como el bot de ShiGa Labs.
 - Usá formato **Markdown** para la respuesta.
 - Si recomendás un producto, explicá por qué es buena opción.
 - Incluir el **nombre**, **precio** y un **[enlace al producto](URL)** si está disponible.
@@ -83,27 +84,22 @@ def index():
 
     if request.method == "POST":
         pregunta = request.form["pregunta"]
+        try:
+            respuesta_bruta = rag_chain.invoke(pregunta)
+            respuesta_limpia = normalizar_precios(respuesta_bruta)
+            respuesta_md = markdown.markdown(respuesta_limpia)
 
-        # Agrega la pregunta al historial con respuesta vacía (se verá como "Pensando...")
-        session["historial"].append({
-            "pregunta": pregunta,
-            "respuesta": None
-        })
-        session.modified = True
-        return redirect(url_for("index"))  # Forzamos recarga GET
-
-    # En GET, buscamos la primera sin respuesta y la procesamos
-    for item in session["historial"]:
-        if item["respuesta"] is None:
-            try:
-                respuesta_bruta = rag_chain.invoke(item["pregunta"])
-                respuesta_limpia = normalizar_precios(respuesta_bruta)
-                respuesta_md = markdown.markdown(respuesta_limpia)
-                item["respuesta"] = respuesta_md
-            except Exception as e:
-                item["respuesta"] = f"<span class='text-danger'>❌ Error: {e}</span>"
+            session["historial"].append({
+                "pregunta": pregunta,
+                "respuesta": respuesta_md
+            })
             session.modified = True
-            break  # solo una por vez
+        except Exception as e:
+            session["historial"].append({
+                "pregunta": pregunta,
+                "respuesta": f"<span class='text-danger'>❌ Error: {e}</span>"
+            })
+            session.modified = True
 
     return render_template("index.html", historial=session["historial"])
 
