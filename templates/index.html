@@ -1,75 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>ShiGa Labs – Chatbot</title>
+  <meta charset="utf-8">
+  <title>🤖 Asistente ShiGa Labs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-    :root {
-      --color-primario: #0d6efd;
-      --color-bot: #f1f1f1;
-      --color-user: #d1e7dd;
-    }
-
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
+      background-color: #f8f9fa;
+      padding-top: 40px;
     }
 
-    #chat-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
-      background-color: var(--color-primario);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      cursor: pointer;
+    .container {
+      max-width: 800px;
     }
 
-    #chat-widget {
-      display: none;
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 380px;
-      max-height: 600px;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 9998;
-    }
-
-    .chat-header {
-      background-color: var(--color-primario);
-      color: white;
-      padding: 12px 16px;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .chat-body {
-      padding: 10px;
-      flex-grow: 1;
-      overflow-y: auto;
-      background-color: #fafafa;
-    }
-
-    .chat-footer {
-      border-top: 1px solid #ddd;
-      padding: 10px;
-      background: white;
+    .chat-container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+      padding: 20px;
     }
 
     .chat-box {
@@ -78,134 +29,67 @@
     }
 
     .user-msg, .bot-msg {
-      padding: 10px 14px;
-      margin: 6px 0;
       max-width: 80%;
-      border-radius: 16px;
-      font-size: 14px;
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-radius: 15px;
+      font-size: 16px;
       white-space: pre-wrap;
-      word-wrap: break-word;
     }
 
     .user-msg {
-      background-color: var(--color-user);
+      background-color: #d1e7dd;
       align-self: flex-end;
+      text-align: right;
+      margin-left: auto;
     }
 
     .bot-msg {
-      background-color: var(--color-bot);
+      background-color: #f1f1f1;
       align-self: flex-start;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    button[type="submit"] {
-      background-color: var(--color-primario);
-      color: white;
-      border: none;
-      padding: 10px 14px;
-      font-size: 14px;
-      margin-top: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-    }
-
-    @media (max-width: 450px) {
-      #chat-widget {
-        width: 95%;
-        right: 2.5%;
-        bottom: 80px;
-      }
+      text-align: left;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
+  <div class="container text-center">
+    <h1 class="mb-4">🛠️ Asistente de compras – <span class="text-primary">ShiGa Labs</span></h1>
 
-<!-- Botón flotante -->
-<button id="chat-toggle">💬</button>
+    <!-- Formulario de búsqueda -->
+    <form method="post" class="mb-2">
+      <div class="input-group">
+        <input type="text" class="form-control" name="pregunta" placeholder="¿Qué estás buscando?" required>
+        <button type="submit" class="btn btn-primary">Consultar</button>
+      </div>
+    </form>
 
-<!-- Chat widget -->
-<div id="chat-widget">
-  <div class="chat-header">
-    Asistente ShiGa Labs
-    <button onclick="document.getElementById('chat-widget').style.display='none'" style="background:none;border:none;color:white;font-size:16px;">✖</button>
-  </div>
-  <div class="chat-body">
-    <div class="chat-box">
-      {% for item in historial %}
-        <div class="user-msg">{{ item.pregunta }}</div>
-        <div class="bot-msg">{{ item.respuesta | safe }}</div>
-        {% if "No he encontrado un producto" in item.respuesta %}
-        <div class="bot-msg">
-          <a class="btn btn-success" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
-            💬 Consultar por WhatsApp
-          </a>
-        </div>
-        {% endif %}
-      {% endfor %}
+    <!-- Botón para borrar conversación -->
+    <form method="post" action="/reset" class="mb-4">
+      <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Borrar conversación</button>
+    </form>
+
+    <!-- Chat visual -->
+    {% if historial %}
+    <div class="chat-container mt-4">
+      <div class="chat-box">
+        {% for item in historial %}
+          <div class="user-msg">📨 {{ item.pregunta }}</div>
+          <div class="bot-msg">{{ item.respuesta | safe }}</div>
+
+          {% if "No he encontrado un producto" in item.respuesta %}
+          <div class="mt-2 mb-2">
+            <a class="btn btn-success btn-sm" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
+              💬 Consultar por WhatsApp
+            </a>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
-  </div>
-  <div class="chat-footer">
-    <form method="post">
-      <input type="text" name="pregunta" placeholder="Escribí tu consulta..." required>
-      <button type="submit">Enviar ➤</button>
-    </form>
-    <form method="post" action="/reset">
-      <button type="submit" style="background:#dc3545">🗑 Borrar conversación</button>
-    </form>
-  </div>
-</div>
-
-<script>
-  document.getElementById("chat-toggle").addEventListener("click", () => {
-    const widget = document.getElementById("chat-widget");
-    widget.style.display = widget.style.display === "block" ? "none" : "block";
-  });
-</script>
-<body>
-
-<!-- Botón flotante (visible al principio) -->
-<button id="chat-toggle">💬</button>
-
-<!-- Widget (inicia oculto) -->
-<div id="chat-widget" style="display: none;">
-  <div class="chat-header">
-    ShiGa Labs Chat
-    <button onclick="document.getElementById('chat-widget').style.display='none'">✖</button>
+    {% endif %}
   </div>
 
-  <div class="chat-body">
-    <div class="chat-box">
-      {% for item in historial %}
-        <div class="user-msg">{{ item.pregunta }}</div>
-        <div class="bot-msg">{{ item.respuesta | safe }}</div>
-      {% endfor %}
-    </div>
-  </div>
-
-  <div class="chat-footer">
-    <form method="post">
-      <input type="text" name="pregunta" placeholder="Escribí tu consulta..." required>
-      <button type="submit">Enviar ➤</button>
-    </form>
-  </div>
-</div>
-
-<script>
-  document.getElementById("chat-toggle").addEventListener("click", () => {
-    const chat = document.getElementById("chat-widget");
-    chat.style.display = chat.style.display === "block" ? "none" : "block";
-  });
-</script>
-
-</body>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
