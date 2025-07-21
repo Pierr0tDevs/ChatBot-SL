@@ -133,7 +133,12 @@
       </div>
 
       {% if item.respuesta and "No he encontrado un producto" in item.respuesta %}
-        <a class="btn btn-sm btn-success whatsapp-link" href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder." target="_blank">
+        <a 
+          class="btn btn-sm btn-success whatsapp-link" 
+          href="https://wa.me/59892807084?text=Hola%20ShiGa%20Labs%2C%20tengo%20una%20consulta%20sobre%20un%20producto%20que%20el%20bot%20no%20pudo%20responder."
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           💬 Consultar por WhatsApp
         </a>
       {% endif %}
@@ -155,27 +160,42 @@
     const pregunta = preguntaInput.value.trim();
     if (!pregunta) return;
 
-    // Insertar mensaje del usuario
+    // Mostrar mensaje del usuario
     const userMsg = document.createElement("div");
     userMsg.className = "chat-message user-msg";
     userMsg.textContent = "📨 " + pregunta;
     chatBody.appendChild(userMsg);
 
-    // Insertar burbuja animada "Pensando..."
+    // Mostrar "Pensando..."
     const botMsg = document.createElement("div");
     botMsg.className = "chat-message bot-msg";
     botMsg.innerHTML = `
       <span class="thinking-bubble text-muted">
         <em>💬 Pensando<span>.</span><span>.</span><span>.</span></em>
-      </span>
-    `;
+      </span>`;
     chatBody.appendChild(botMsg);
 
-    // Scroll al fondo
     chatBody.scrollTop = chatBody.scrollHeight;
+
+    // Pequeño delay para asegurar render antes del reload
+    setTimeout(() => {
+      chatForm.submit();
+    }, 50);
+
+    e.preventDefault();
   });
 
-  // Scroll inicial (solo si ya estamos abajo)
+  // Forzar apertura de WhatsApp en nueva pestaña desde iframe
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".whatsapp-link").forEach(btn => {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        window.open(this.href, "_blank", "noopener");
+      });
+    });
+  });
+
+  // Scroll automático si está cerca del fondo
   if (chatBody) {
     const isNearBottom = chatBody.scrollHeight - chatBody.scrollTop - chatBody.clientHeight < 60;
     if (isNearBottom) {
