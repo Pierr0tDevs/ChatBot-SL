@@ -14,12 +14,12 @@ import re
 # ✅ Crear app Flask y configuración de sesión
 app = Flask(__name__)
 app.secret_key = ""  # Cambiá esto por algo seguro
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
 app.config["SESSION_COOKIE_SAMESITE"] = "None"  # Permitir cookies cross-site
 app.config["SESSION_COOKIE_SECURE"] = True      # Requiere HTTPS
 app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+
 
 
 # ✅ Configurar API Key de Google
