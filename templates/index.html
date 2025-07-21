@@ -169,6 +169,43 @@
     widget.style.display = widget.style.display === "block" ? "none" : "block";
   });
 </script>
+<body>
+
+<!-- Botón flotante (visible al principio) -->
+<button id="chat-toggle">💬</button>
+
+<!-- Widget (inicia oculto) -->
+<div id="chat-widget" style="display: none;">
+  <div class="chat-header">
+    ShiGa Labs Chat
+    <button onclick="document.getElementById('chat-widget').style.display='none'">✖</button>
+  </div>
+
+  <div class="chat-body">
+    <div class="chat-box">
+      {% for item in historial %}
+        <div class="user-msg">{{ item.pregunta }}</div>
+        <div class="bot-msg">{{ item.respuesta | safe }}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="chat-footer">
+    <form method="post">
+      <input type="text" name="pregunta" placeholder="Escribí tu consulta..." required>
+      <button type="submit">Enviar ➤</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById("chat-toggle").addEventListener("click", () => {
+    const chat = document.getElementById("chat-widget");
+    chat.style.display = chat.style.display === "block" ? "none" : "block";
+  });
+</script>
+
+</body>
 
 </body>
 </html>
